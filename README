@@ -1,0 +1,9 @@
+an attempt to make it work with shapado.
+I think it doesnt understand the time entry correctly, 
+it falls into an endless fetching loop yet doesnt fetch all questions.
+
+also added an incomplete build.xml (or how do you do it, nathan?)
+
+and changed sensitivity so it would respond to simple keywords too.
+
+bump to sdk 1.3.7.
