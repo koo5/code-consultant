@@ -1,0 +1,4 @@
+#Triggers file version 1.0
+-publics -channels '#diaspora' -regexp '^DiasporaBot.? (.*)$' -command '/msg -localhost diaspora-consultant $1' 
+-privmsgs -nocase -tags 'localhost' -masks 'diaspora-consultant' -regexp '(^.*$)' -command 'msg -freenode #diaspora $1' 
+-publics -channels '&bitlbee' -channels '&bitlbee' -pattern 'Signing off..' -command '/say account on' 

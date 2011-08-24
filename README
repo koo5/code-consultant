@@ -1,4 +1,7 @@
-an attempt to make it work with shapado.
+well a big thank you to nathan for making this public, heres the mess i made of it trying to make it work as an irc bot for diaspora's shapado
+
+the actual ircizing was done with bitlbee and irssi, triggers are attached.
+
 I think it doesnt understand the time entry correctly, 
 it falls into an endless fetching loop yet doesnt fetch all questions.
 
