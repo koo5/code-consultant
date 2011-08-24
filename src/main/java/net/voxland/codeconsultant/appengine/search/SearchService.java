@@ -70,8 +70,8 @@ public class SearchService {
             boost.put("title", 10F);
             boost.put("body", 5F);
             IndexSearcher indexSearcher = new IndexSearcher(directory);
-//            String luceneQuery = "\"" + query.replaceAll("[^\\w\\s]", "") + "\"~20";
-            String luceneQuery = query;
+            String luceneQuery = "\"" + query.replaceAll("[^\\w\\s]", "") + "\"~20";
+            //String luceneQuery = query;
             log.info("Lucene query: "+luceneQuery);
             TopDocs docs = indexSearcher.search(new MultiFieldQueryParser(new String[]{"title", "body"}, analzer, boost).parse(luceneQuery), 1);
 
@@ -81,7 +81,7 @@ public class SearchService {
             } else {
                 Document hit = indexSearcher.doc(docs.scoreDocs[0].doc);
                 log.info("Best Match: " + hit.get("title") + " with a score of " + docs.scoreDocs[0].score + " vs " + docs.getMaxScore() + " total hits: " + docs.totalHits);
-                if (docs.scoreDocs[0].score > .8) {
+                if (docs.scoreDocs[0].score > .005) {
                     return new StackOverflowQuestionHit(hit.get("questionId"), hit.get("title"), docs.scoreDocs[0].score);
                 } else {
                     log.info("Not high enough");

@@ -73,7 +73,7 @@ public class QuestionFetcherServlet extends HttpServlet {
 
 
         LogFactory.getLog(getClass()).info("Fetching Questions since " + lastCreated);
-        URL url = new URL("http://api.stackoverflow.com/1.0/questions?key=V2f1_4yrckGfUSa8vHuQhg&body=true&pagesize=100&sort=creation&order=asc&fromdate=" + (lastCreated.getTime() / 1000));
+        URL url = new URL("http://diaspora.shapado.com/questions?format=json&body=true&pagesize=100&sort=creation&order=asc&fromdate=" + (lastCreated.getTime() / 1000));
         URLConnection urlConnection = url.openConnection();
         urlConnection.setRequestProperty("Content-Encoding", "gzip");
         JsonNode rootNode = null;
@@ -101,7 +101,7 @@ public class QuestionFetcherServlet extends HttpServlet {
 
         Iterator<JsonNode> questions;
         try {
-            questions = rootNode.get("questions").iterator();
+            questions = rootNode.iterator();
             StackOverflowQuestion stackOverflowQuestion = null;
             List<StackOverflowQuestion> stackOverflowQuestions = new ArrayList<StackOverflowQuestion>();
 
@@ -112,8 +112,15 @@ public class QuestionFetcherServlet extends HttpServlet {
 
                 stackOverflowQuestion = new StackOverflowQuestion();
                 stackOverflowQuestion.setTitle(question.get("title").getValueAsText());
-                stackOverflowQuestion.setQuestionId(question.get("question_id").getValueAsText());
-                stackOverflowQuestion.setCreatedDate(new Date(question.get("creation_date").getLongValue() * 1000));
+                stackOverflowQuestion.setQuestionId(question.get("id").getValueAsText());
+                //here be bug, cant parse this time format with the libs we have, or something, i dont remember
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                try{
+                        stackOverflowQuestion.setCreatedDate(df.parse(question.get("created_at").getValueAsText()));
+                }catch (ParseException e)
+                {
+                        LogFactory.getLog(getClass()).info("Fuck "+ question.get("created_at").getValueAsText());
+                }
                 stackOverflowQuestion.setBody(body);
                 stackOverflowQuestion.computeSearchKeys();
 
@@ -195,7 +202,6 @@ public class QuestionFetcherServlet extends HttpServlet {
 
                     lastStackOverflowQuestion = stackOverflowQuestion;
                     stackOverflowQuestions.add(stackOverflowQuestion);
-
                 } else {
                     System.out.println("not");
                 }

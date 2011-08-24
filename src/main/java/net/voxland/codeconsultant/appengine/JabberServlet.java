@@ -64,42 +64,47 @@ public class JabberServlet extends HttpServlet {
                 {
                      Message msg = new MessageBuilder()
                              .withRecipientJids(fromJid)
-                             .withBody("Hello, I'm your Code Consulatant")
+                             .withBody("Hello, I'm your Diaspora Consulatant. Ever notice how just talking through an issue with a co-worker is enough to help you solve a problem, even if they don't say a word? Let me help you with your problems so they can keep working.") // irc-friendly - one line
                              .build();
                      xmpp.sendMessage(msg);
-
-                    msg = new MessageBuilder()
-                            .withRecipientJids(fromJid)
-                            .withBody("Ever notice how just talking through an issue with a co-worker is enough to help you solve a problem, even if they don't say a word?")
-                            .build();
-                    xmpp.sendMessage(msg);
-
-                    msg = new MessageBuilder()
-                            .withRecipientJids(fromJid)
-                            .withBody("Let me help you with your problems so they can keep working.")
-                            .build();
-                    xmpp.sendMessage(msg);
 
                  }
 
             }
 
-            String talkerBody = talker.processInput(body);
-            {
-                Message msg = new MessageBuilder()
-                        .withRecipientJids(fromJid)
-                        .withBody(talkerBody)
-                        .build();
 
-                xmpp.sendMessage(msg);
+	    String talkerBody = talker.processInput(body);
+	    Boolean answered = false;
+
+
+	    if (body.equals("ping"))
+	    {
+	            Message msg = new MessageBuilder()
+                            .withRecipientJids(fromJid)
+                            .withBody("pong")
+                            .build();
+
+                    xmpp.sendMessage(msg);
+                    answered = true;
+	    }
+	    if (body.equals("PING"))
+	    {
+	            Message msg = new MessageBuilder()
+                            .withRecipientJids(fromJid)
+                            .withBody("PONG")
+                            .build();
+
+                    xmpp.sendMessage(msg);
+                    answered = true;
             }
 
             SearchService.StackOverflowQuestionHit hit = null;
-            if (body.contains(" ") && body.length() > 10) { //enough to get a good query
-                //            System.out.println(searchQuery);
+            //if (body.contains(" ") && body.length() > 10) //enough to get a good query
+            if (!answered)
+            { 
                 hit = SearchService.getInstance().findBest(body);
                 if (hit != null) {
-                    String stackOverflowBody = "Does '" + hit.title + "' help?\n[http://stackoverflow.com/questions/" + hit.questionId + "]";
+                    String stackOverflowBody = "Does '" + hit.title + "' help? http://diaspora.shapado.com/questions/" + hit.questionId;
 
                     Message msg = new MessageBuilder()
                             .withRecipientJids(fromJid)
@@ -107,8 +112,19 @@ public class JabberServlet extends HttpServlet {
                             .build();
 
                     xmpp.sendMessage(msg);
+                    answered = true;
                 }
             }
+
+	    if (!answered)
+	    {
+                Message msg = new MessageBuilder()
+                    .withRecipientJids(fromJid)
+                    .withBody(talkerBody)
+                    .build();
+
+                xmpp.sendMessage(msg);
+    	    }
 
 
             try {
@@ -135,6 +151,14 @@ public class JabberServlet extends HttpServlet {
             } finally {
                 pm.close();
             }
+//        PrintWriter writer = resp.getWriter();
+//        writer.println("Hello, I'm your Code Consulatant.");
+//        writer.println("Ever notice how just talking through an issue with a co-worker is enough to help you solve a problem, even if they don't say a word?");
+//        writer.println("Let me help you with your problems so they can keep working.");
+//
+//        if (body != null) {
+//            writer.println(talker.processInput(body));
+//        }
         } catch (Throwable e) {
             Message msg = new MessageBuilder()
                     .withRecipientJids(fromJid)
